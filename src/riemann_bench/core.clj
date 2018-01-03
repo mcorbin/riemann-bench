@@ -76,13 +76,16 @@
   [dir]
   (let [p (system "lein" "do" "clean," "run" "--"
                   (expand-path "riemann.config") :dir dir)]
-    (await-tcp-server)
+                                        ;    (await-tcp-server)
+    (println "start server")
+    (Thread/sleep 25000)
     p))
 
 (defn stop-server
   "Stop a riemann server."
   [process]
   (let [code (future (sh/exit-code process))]
+    (println "start server")
     (kill-children :term (:process process))
     (println "Server exited with" @code)))
 
@@ -137,17 +140,17 @@
 (def run-tcp-async-single
   (async-tcp-run
     {:name        "tcp async single"
-     :n           40000000
-     :threads     8
-     :queue-size  128
+     :n           4000000
+     :threads     2
+     :queue-size  32
      :events      [(example-event)]}))
 
 (def run-tcp-async-bulk
   (async-tcp-run
     {:name        "tcp async bulk"
-     :n           2000000
-     :threads     8
-     :queue-size  32
+     :n           300000
+     :threads     2
+     :queue-size  16
      :events      (take 100 (repeatedly example-event))}))
 
 (defn suite
